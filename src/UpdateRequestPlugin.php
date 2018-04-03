@@ -3,6 +3,7 @@
 namespace O0h\ComposerUpdateRequest;
 
 use Composer\Composer;
+use Composer\Factory as ComposerFactory;
 use Composer\IO\IOInterface;
 use Composer\Script\ScriptEvents;
 use Composer\Script\Event;
@@ -56,8 +57,9 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $pjRoot = $this->getPjRoot();
         $git = new GitService($pjRoot);
         $r = $git->createBranch();
-        $git->commitAll();
-        var_dump($r);
+        $composerFile = ComposerFactory::getComposerFile();
+        $lockFile = substr($composerFile, 0,  '-4') . 'lock';
+        $git->commit($lockFile);
     }
 
     protected function getLocalPackages()
@@ -73,7 +75,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
     protected function getPjRoot()
     {
-        $dir = __DIR__;
+        $dir = getcwd();
         while (true) {
             $path = $dir . DIRECTORY_SEPARATOR . '.git';
             if (file_exists($path) && is_dir($path)) {

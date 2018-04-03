@@ -8,10 +8,7 @@
 
 namespace O0h\ComposerUpdateRequest;
 
-use TQ\Git\Repository\Repository;
-use TQ\Vcs\Cli\CallResult;
-use TQ\Vcs\Repository\Transaction;
-use GitWrapper\GitWrapper;
+use Cz\Git\GitRepository;
 
 class GitService
 {
@@ -20,30 +17,21 @@ class GitService
 
     public function __construct(string $directory)
     {
-        $this->git = Repository::open($directory);
+        $this->git = new GitRepository($directory);
     }
 
     public function createBranch()
     {
         $branchName = $this->getBranchName();
-        $this->git->getGit();
-        /** @var $result CallResult */
-        $result = $this->git->getGit()->{'checkout'}($this->git->getRepositoryPath(), [
-            '-b',
-            $branchName
-        ]);
-        $result->assertSuccess('Failed to create new branch. ' . $result->getStdErr());
+        $result = $this->git->createBranch($branchName, true);
 
         return $result;
     }
 
-    public function commitAll()
+    public function commit(string $path)
     {
-        $result = $this->git->transactional(function(Transaction $t) {
-            $t->setCommitMsg('the commit is aaa..');
-        });
-
-        return $result;
+        $this->git->addFile($path);
+        return $this->git->commit('update composer dependencies');
     }
 
     protected function getBranchName()
