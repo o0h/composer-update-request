@@ -32,7 +32,12 @@ class GitService
     {
         $this->git->addFile($path);
         $this->git->commit('update composer dependencies');
-        return $this->git->push('origin', [$this->getCurrentBranchName()]);
+        $token = getenv('GITHUB_TOKEN');
+
+        return $this->git->push('origin', [
+            '--repo' => "https://git:{$token}@github.com/o0h/composer-update-request-test-app.git",
+            $this->getCurrentBranchName(),
+        ]);
     }
 
     public function getCurrentBranchName()

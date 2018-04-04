@@ -40,6 +40,10 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
+        if (!getenv('ENABLE_AUTO_CREATE_COMPOSER_UPDATE_REQUEST')) {
+            return [];
+        }
+
         return [
             ScriptEvents::PRE_UPDATE_CMD => [
                 'onPreUpdate',
