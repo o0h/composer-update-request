@@ -28,12 +28,18 @@ class GitService
         return $result;
     }
 
-    public function commit(string $path)
+    public function commitAndPush(string $path)
     {
         $this->git->addFile($path);
-        return $this->git->commit('update composer dependencies');
+        $this->git->commit('update composer dependencies');
+        return $this->git->push('origin', [$this->getCurrentBranchName()]);
     }
 
+    public function getCurrentBranchName()
+    {
+        return $this->git->getCurrentBranchName();
+
+    }
     protected function getBranchName()
     {
         return sprintf('update-composer-%s', date('Ymdhis'));

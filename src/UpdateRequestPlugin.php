@@ -5,8 +5,7 @@ namespace O0h\ComposerUpdateRequest;
 use Composer\Composer;
 use Composer\Factory as ComposerFactory;
 use Composer\IO\IOInterface;
-use Composer\Script\ScriptEvents;
-use Composer\Script\Event;
+use Composer\Script\ScriptEvents; use Composer\Script\Event;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Plugin\PluginInterface;
 
@@ -28,6 +27,15 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->includeGuzzleFunctions();
+    }
+
+    private function includeGuzzleFunctions()
+    {
+        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        require_once "{$vendorDir}/guzzlehttp/guzzle/src/functions_include.php";
+        require_once "{$vendorDir}/guzzlehttp/psr7/src/functions_include.php";
+        require_once "{$vendorDir}/guzzlehttp/promises/src/functions_include.php";
     }
 
     public static function getSubscribedEvents()
@@ -52,14 +60,19 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
         if (!$diff) {
-            // return;
+            return true;
         }
         $pjRoot = $this->getPjRoot();
         $git = new GitService($pjRoot);
         $r = $git->createBranch();
         $composerFile = ComposerFactory::getComposerFile();
         $lockFile = substr($composerFile, 0,  '-4') . 'lock';
-        $git->commit($lockFile);
+        $git->commitAndPush($lockFile);
+
+        $hub = new GithubService();
+        $title = $this->generatePullRequestTitle();
+        $body = $this->generatePullRequestBody($diff);
+        $hub->createPullRequest($title, $body, $git->getCurrentBranchName());
     }
 
     protected function getLocalPackages()
@@ -87,4 +100,44 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
         return $path;
     }
+
+    protected function generatePullRequestTitle()
+    {
+        return sprintf('PHP dependencies update.(%d)', date('Ymd'));
+    }
+
+    protected function generatePullRequestBody(array $diff)
+    {
+        $templatePath = $this->getPjRoot() . 'PULL_REQUEST_TEMPLATE/composer_update.md';
+        if (file_exists($templatePath)) {
+            $content = file_get_contents($templatePath)
+                . PHP_EOL
+                . PHP_EOL
+                . '----'
+                . PHP_EOL;
+        } else {
+            $content = 'PHP dependencies update.' . PHP_EOL;
+        }
+        $content .= 'The bellow packages will be updated.'
+            . PHP_EOL
+            . PHP_EOL
+            . '| package | before | current |'
+            . PHP_EOL
+            . '| ---- | ---- | ---- |'
+            . PHP_EOL;
+
+        ;
+        foreach ($diff as $name => $ver) {
+            $content .= sprintf(
+                '| %s | %s | %s |' . PHP_EOL,
+                $name,
+                $this->before[$name] ?? '--',
+                $ver
+            );
+
+        }
+
+        return $content;
+    }
+
 }
