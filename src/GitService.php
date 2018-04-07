@@ -12,7 +12,7 @@ use Cz\Git\GitRepository;
 
 class GitService
 {
-    /** @var Repository */
+    /** @var GitRepository */
     protected $git;
 
     public function __construct(string $directory)
@@ -34,10 +34,14 @@ class GitService
         $this->git->commit('update composer dependencies');
         $token = getenv('GITHUB_TOKEN');
 
-        return $this->git->push('origin', [
-            '--repo' => "https://git:{$token}@github.com/o0h/composer-update-request-test-app.git",
-            $this->getCurrentBranchName(),
-        ]);
+        $remoteUrl = sprintf(
+            'https://%s:%s@github.com/o0h/composer-update-request-test-app.git',
+            'o0h',
+            $token
+        );
+        $this->git->setRemoteUrl('origin', $remoteUrl);
+
+        return $this->git->push('origin', [$this->getCurrentBranchName()]);
     }
 
     public function getCurrentBranchName()
