@@ -30,7 +30,12 @@ class GitService
 
     public function commitAndPush(string $path)
     {
+        var_dump(compact('path'));
+        exec('git status');
         $this->git->addFile($path);
+        exec('git status');
+        $this->git->addAllChanges($path);
+        exec('git status');
 
         if (!$this->git->hasChanges()) {
             throw new \RuntimeException('Nothing to commit.');
