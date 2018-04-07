@@ -28,7 +28,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
     public function activate(Composer $composer, IOInterface $io)
     {
-        if ($composer->getPackage()->getName() === '__root_') {
+        if ($composer->getPackage()->getName() === '__root__') {
             $this->onRoot = true;
         }
 
