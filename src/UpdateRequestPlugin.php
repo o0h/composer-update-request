@@ -66,6 +66,8 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         if (!$diff) {
             return true;
         }
+
+        $this->io->write('Starting to create composer-update pull request!');
         $pjRoot = $this->getPjRoot();
         $git = new GitService($pjRoot);
         $r = $git->createBranch();
@@ -76,7 +78,10 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $hub = new GithubService();
         $title = $this->generatePullRequestTitle();
         $body = $this->generatePullRequestBody($diff);
-        $hub->createPullRequest($title, $body, $git->getCurrentBranchName());
+        $result = $hub->createPullRequest($title, $body, $git->getCurrentBranchName());
+
+        $this->io->write('Complete!');
+        $this->io->write('Check the request in ' . $result['html_url']);
     }
 
     protected function getLocalPackages()
