@@ -28,14 +28,14 @@ class GitService
         return $result;
     }
 
-    public function commitAndPush(string $path)
+    public function hasChanges()
     {
-        if (!$this->git->hasChanges()) {
-            return false;
-        }
+        return $this->git->hasChanges();
+    }
 
-        $this->git->addFile($path);
-        $this->git->addAllChanges($path);
+    public function commitAndPush(string $lockFilepath)
+    {
+        $this->git->addFile($lockFilepath);
 
         $this->git->commit('update composer dependencies');
         $token = getenv('GITHUB_TOKEN');

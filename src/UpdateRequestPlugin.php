@@ -70,7 +70,19 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         if ($this->onRoot) {
             return true;
         }
+
+        $composerFile = ComposerFactory::getComposerFile();
+        chdir(dirname($composerFile));
+
         $this->includeGuzzleFunctions();
+        $pjRoot = $this->getPjRoot();
+        $git = new GitService($pjRoot);
+        if (!$git->hasChanges()) {
+            $this->io->write('Nothing to update!');
+
+            return true;
+        }
+
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
         if (!$diff) {
@@ -78,16 +90,9 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         $this->io->write('Starting to create composer-update pull request!');
-        $composerFile = ComposerFactory::getComposerFile();
-        chdir(dirname($composerFile));
-        $pjRoot = $this->getPjRoot();
-        $git = new GitService($pjRoot);
         $git->createBranch();
         $lockFile = substr($composerFile, 0,  '-4') . 'lock';
-        if (!$git->commitAndPush($lockFile)) {
-            $this->io->write('Nothing to update!');
-            return true;
-        }
+        $git->commitAndPush($lockFile);
 
         $hub = new GithubService();
         $title = $this->generatePullRequestTitle();
