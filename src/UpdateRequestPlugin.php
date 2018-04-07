@@ -28,7 +28,6 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
     {
         $this->composer = $composer;
         $this->io = $io;
-        $this->includeGuzzleFunctions();
     }
 
     private function includeGuzzleFunctions()
@@ -58,6 +57,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
     public function onPostUpdate(Event $arg)
     {
+        $this->includeGuzzleFunctions();
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
         if (!$diff) {
