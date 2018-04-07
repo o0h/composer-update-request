@@ -30,7 +30,7 @@ class GithubService
     public function createPullRequest($title, $content, $branch)
     {
         $pullRequest = $this->hub->api('pull_request')->create($this->user, 'composer-update-request-test-app', [
-            'base'  => 'update-composer-20180403012755',
+            'base'  => 'master',
             'head'  => $branch,
             'title' => $title,
             'body'  => $content,
