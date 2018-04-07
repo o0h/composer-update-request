@@ -5,6 +5,7 @@ namespace O0h\ComposerUpdateRequest;
 use Composer\Composer;
 use Composer\Factory as ComposerFactory;
 use Composer\IO\IOInterface;
+use Composer\Repository\BaseRepository;
 use Composer\Script\ScriptEvents; use Composer\Script\Event;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Plugin\PluginInterface;
@@ -130,16 +131,19 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $content .= 'The bellow packages will be updated.'
             . PHP_EOL
             . PHP_EOL
-            . '| package | before | current |'
+            . '| package | required by | before | current |'
             . PHP_EOL
-            . '| ---- | ---- | ---- |'
+            . '| ---- | ---- | ---- | ---- |'
             . PHP_EOL;
 
-        ;
+        /** @var BaseRepository $repository */
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         foreach ($diff as $name => $ver) {
+            $why = $repository->getDependents($name);
             $content .= sprintf(
-                '| %s | %s | %s |' . PHP_EOL,
+                '| %s | %s | %s | %s |' . PHP_EOL,
                 $name,
+                implode(',' , array_keys($why)),
                 $this->before[$name] ?? '--',
                 $ver
             );
