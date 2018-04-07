@@ -80,7 +80,6 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $composerFile = ComposerFactory::getComposerFile();
         chdir(dirname($composerFile));
         $pjRoot = $this->getPjRoot();
-        var_dump($pjRoot);
         $git = new GitService($pjRoot);
         $r = $git->createBranch();
         $lockFile = substr($composerFile, 0,  '-4') . 'lock';
@@ -110,10 +109,8 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
     protected function getPjRoot()
     {
         $dir = getcwd();
-        var_dump($dir);
         while (true) {
             $path = $dir . DIRECTORY_SEPARATOR . '.git';
-            var_dump($path);
             if (file_exists($path) && is_dir($path)) {
                 break;
             }
