@@ -24,8 +24,14 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
     /** @var array packages after updating */
     protected $after = [];
 
+    protected $onRoot = false;
+
     public function activate(Composer $composer, IOInterface $io)
     {
+        if ($composer->getPackage()->getName() === '__root_') {
+            $this->onRoot = true;
+        }
+
         $this->composer = $composer;
         $this->io = $io;
     }
@@ -52,11 +58,17 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
     public function onPreUpdate(Event $arg)
     {
+        if ($this->onRoot) {
+            return true;
+        }
         $this->before = $this->getLocalPackages();
     }
 
     public function onPostUpdate(Event $arg)
     {
+        if ($this->onRoot) {
+            return true;
+        }
         $this->includeGuzzleFunctions();
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
