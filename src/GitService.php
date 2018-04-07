@@ -30,6 +30,7 @@ class GitService
 
     public function commitAndPush(string $path)
     {
+        echo file_get_contents($path);
         var_dump(compact('path'));
         system('git status');
         $this->git->addFile($path);

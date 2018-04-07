@@ -73,6 +73,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $this->includeGuzzleFunctions();
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
+        var_dump($diff);
         if (!$diff) {
             return true;
         }
