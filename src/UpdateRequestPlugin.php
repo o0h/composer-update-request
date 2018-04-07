@@ -73,7 +73,6 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $this->includeGuzzleFunctions();
         $packages = $this->getLocalPackages();
         $diff = array_diff_assoc($packages, $this->before);
-        var_dump($diff);
         if (!$diff) {
             return true;
         }
@@ -83,10 +82,12 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         chdir(dirname($composerFile));
         $pjRoot = $this->getPjRoot();
         $git = new GitService($pjRoot);
-        $r = $git->createBranch();
+        $git->createBranch();
         $lockFile = substr($composerFile, 0,  '-4') . 'lock';
-        var_dump($lockFile);
-        $git->commitAndPush($lockFile);
+        if (!$git->commitAndPush($lockFile)) {
+            $this->io->write('Nothing to update!');
+            return true;
+        }
 
         $hub = new GithubService();
         $title = $this->generatePullRequestTitle();
