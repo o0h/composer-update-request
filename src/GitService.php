@@ -30,6 +30,10 @@ class GitService
 
     public function commitAndPush(string $path)
     {
+        if (!$this->git->hasChanges()) {
+            throw new \RuntimeException('Nothing to commit.');
+        }
+
         $this->git->addFile($path);
         $this->git->commit('update composer dependencies');
         $token = getenv('GITHUB_TOKEN');
