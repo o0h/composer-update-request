@@ -39,9 +39,9 @@ class GitService
         return $hasChanged;
     }
 
-    public function commitAndPush(string $lockFilePath)
+    public function commitAndPush()
     {
-        $this->git->addFile($lockFilePath);
+        $this->git->addAllChanges();
 
         $this->git->commit('update composer dependencies');
         $token = getenv('GITHUB_TOKEN');

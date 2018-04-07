@@ -93,7 +93,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
         $this->io->write('Starting to create composer-update pull request!');
         $git->createBranch();
-        $git->commitAndPush($lockFile);
+        $git->commitAndPush();
 
         $hub = new GithubService();
         $title = $this->generatePullRequestTitle();
