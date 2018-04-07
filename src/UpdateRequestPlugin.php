@@ -74,24 +74,25 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $composerFile = ComposerFactory::getComposerFile();
         chdir(dirname($composerFile));
 
+        $lockFile = substr($composerFile, 0,  '-4') . 'lock';
+
         $this->includeGuzzleFunctions();
         $pjRoot = $this->getPjRoot();
         $git = new GitService($pjRoot);
-        if (!$git->hasChanges()) {
+
+        if (!$git->hasChanges($lockFile)) {
             $this->io->write('Nothing to update!');
-
-            return true;
+            $diff = false;
+        } else {
+            $packages = $this->getLocalPackages();
+            $diff = array_diff_assoc($packages, $this->before);
         }
-
-        $packages = $this->getLocalPackages();
-        $diff = array_diff_assoc($packages, $this->before);
         if (!$diff) {
             return true;
         }
 
         $this->io->write('Starting to create composer-update pull request!');
         $git->createBranch();
-        $lockFile = substr($composerFile, 0,  '-4') . 'lock';
         $git->commitAndPush($lockFile);
 
         $hub = new GithubService();
