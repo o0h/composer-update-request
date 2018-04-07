@@ -77,11 +77,12 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         $this->io->write('Starting to create composer-update pull request!');
+        $composerFile = ComposerFactory::getComposerFile();
+        chdir(dirname($composerFile));
         $pjRoot = $this->getPjRoot();
         var_dump($pjRoot);
         $git = new GitService($pjRoot);
         $r = $git->createBranch();
-        $composerFile = ComposerFactory::getComposerFile();
         $lockFile = substr($composerFile, 0,  '-4') . 'lock';
         var_dump($lockFile);
         $git->commitAndPush($lockFile);
