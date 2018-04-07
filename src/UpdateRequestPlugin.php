@@ -29,6 +29,7 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io)
     {
         if ($composer->getPackage()->getName() === '__root__') {
+            $io->write('Called in root, skip composer update auto request.');
             $this->onRoot = true;
         }
 
