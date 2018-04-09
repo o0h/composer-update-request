@@ -82,14 +82,12 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
 
         if (!$git->hasChanges($lockFile)) {
             $this->io->write('Nothing to update!');
-            $diff = false;
-        } else {
-            $packages = $this->getLocalPackages();
-            $diff = array_diff_assoc($packages, $this->before);
-        }
-        if (!$diff) {
+
             return true;
         }
+
+        $packages = $this->getLocalPackages();
+        $diff = array_diff_assoc($packages, $this->before);
 
         $this->io->write('Starting to create composer-update pull request!');
         $git->createBranch();
