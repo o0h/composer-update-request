@@ -31,12 +31,12 @@ class GitService
     public function hasChanges($path)
     {
         $executed = $this->git->execute(['status', $path]);
-        var_dump($executed);
         $hasChanged = strpos(
             implode($executed),
             'nothing to commit.'
         ) === false;
 
+        var_dump(compact('executed', 'hasChanged'));
         return $hasChanged;
     }
 
