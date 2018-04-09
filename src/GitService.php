@@ -30,9 +30,9 @@ class GitService
 
     public function hasChanges($path)
     {
-        $executed = $this->git->execute(['status', $path]);
+        $executed = implode($this->git->execute(['status', $path]));
         $hasChanged = strpos(
-            implode($executed),
+            $executed,
             'nothing to commit.'
         ) === false;
 
