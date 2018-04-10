@@ -1,0 +1,36 @@
+{
+    "name": "o0h/composer-update-request",
+    "description": "Support to easily keep composer packages up-to-date, making pull request",
+    "type": "composer-plugin",
+    "require": {
+        "php": "^7.0",
+        "composer-plugin-api": "^1.0",
+        "czproject/git-php": "^3.13",
+        "knplabs/github-api": "^2.8",
+        "guzzlehttp/psr7": "^1.4",
+        "php-http/guzzle6-adapter": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "O0h\\ComposerUpdateRequest\\": "src/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hideki Kinjyo",
+            "email": "dev@o0h.in"
+        }
+    ],
+    "require-dev": {
+        "composer/composer": "*",
+        "phpunit/phpunit": "^6.0",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "scripts": {
+        "cs": "phpcs"
+    },
+    "extra": {
+        "class": "O0h\\ComposerUpdateRequest\\UpdateRequestPlugin"
+    }
+}

@@ -1,0 +1,10 @@
+language: php
+php:
+  - '7.1'
+
+before_script:
+  - git config --global user.email "mail@example.com"
+  - git config --global user.name "I am Travis"
+
+script:
+  - if [ "${TRAVIS_EVENT_TYPE}" = "cron" ]; then composer global require o0h/composer-update-request:dev-master@dev --no-suggest && cd $TRAVIS_BUILD_DIR && composer update; fi
