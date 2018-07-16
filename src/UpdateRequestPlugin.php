@@ -208,14 +208,24 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
      */
     protected function generatePullRequestBody(array $diff)
     {
-        $templatePath = $this->getPjRoot() . 'PULL_REQUEST_TEMPLATE/composer_update.md';
-        if (file_exists($templatePath)) {
-            $content = file_get_contents($templatePath)
-                . PHP_EOL
-                . PHP_EOL
-                . '----'
-                . PHP_EOL;
-        } else {
+        $content = null;
+        $dirs = [
+            $this->getPjRoot(),
+            $this->getPjRoot() . '.github/',
+            $this->getPjRoot() . 'docs/',
+        ];
+        foreach ($dirs as $dir) {
+            $templatePath = $dir . 'PULL_REQUEST_TEMPLATE/composer_update.md';
+            if (file_exists($templatePath)) {
+                $content = file_get_contents($templatePath)
+                    . PHP_EOL
+                    . PHP_EOL
+                    . '----'
+                    . PHP_EOL;
+                break;
+            }
+        }
+        if (!$content) {
             $content = 'PHP dependencies update.' . PHP_EOL;
         }
         $content .= 'The bellow packages will be updated.'
