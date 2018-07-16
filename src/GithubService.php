@@ -48,6 +48,25 @@ class GithubService
     }
 
     /**
+     * Set request assignees.
+     *
+     * @param int $issue Issue(Pull Request) number
+     * @param array $assignees User-ids to assign
+     * @return mixed
+     */
+    public function setAssignee(int $issue, array $assignees)
+    {
+        return $this->hub->api('issues')
+            ->assignees()
+            ->add(
+                $this->org,
+                $this->repo,
+                $issue,
+                compact('assignees')
+            );
+    }
+
+    /**
      * Setup Github Client
      */
     protected function setClient()

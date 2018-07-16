@@ -149,6 +149,11 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         $body = $this->generatePullRequestBody($diff);
         $result = $hub->createPullRequest($title, $body, $git->getCurrentBranchName());
 
+        if ($assignTo = getenv('GITHUB_DEFAULT_ASSIGNEE')) {
+            $assignTo = explode(',', $assignTo);
+            $hub->setAssignee($result['number'], $assignTo);
+        }
+
         $this->io->write('Complete!');
         $this->io->write('Check the request in ' . $result['html_url']);
 
