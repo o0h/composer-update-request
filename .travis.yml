@@ -14,3 +14,12 @@ before_script:
 
 script:
   - composer cs
+
+after_success:
+  - |
+      # obrained from https://github.com/codecov/codecov-bash/issues/133#issuecomment-447337868
+      if [[ $TRAVIS_PHP_VERSION == '7.3' ]]; then
+        curl -s https://codecov.io/bash > codecov
+        sed -i -e 's/TRAVIS_.*_VERSION/^TRAVIS_.*_VERSION=/' codecov
+        bash codecov
+      fi
