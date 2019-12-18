@@ -6,6 +6,7 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Factory as ComposerFactory;
 use Composer\IO\IOInterface;
+use Composer\Package\Package;
 use Composer\Repository\BaseRepository;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
@@ -244,11 +245,16 @@ class UpdateRequestPlugin implements PluginInterface, EventSubscriberInterface
         /** @var BaseRepository $repository */
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         foreach ($diff as $name => $ver) {
-            $why = $repository->getDependents($name);
+            $why = array_map(function (array $dependent) {
+                /** @var Package $package */
+                list($package) = $dependent;
+
+                return $package->getName();
+            }, $repository->getDependents($name));
             $content .= sprintf(
                 '| %s | %s | %s | %s |' . PHP_EOL,
                 $name,
-                implode("<br>", array_keys($why)),
+                implode("<br>", array_unique($why)),
                 $this->before[$name] ?? '--',
                 $ver
             );
